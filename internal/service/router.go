@@ -17,7 +17,8 @@ func (s *service) router() chi.Router {
 		),
 	)
 	r.Route("/integrations/link-shortener-svc", func(r chi.Router) {
-		// configure endpoints here
+		r.Get("/{code}", handlers.URLHandler)
+		r.Post("/", handlers.URLHandler)
 	})
 
 	return r

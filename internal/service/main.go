@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"net"
 	"net/http"
 
@@ -14,6 +15,7 @@ type service struct {
 	log      *logan.Entry
 	copus    types.Copus
 	listener net.Listener
+	DB       *sql.DB
 }
 
 func (s *service) run() error {
