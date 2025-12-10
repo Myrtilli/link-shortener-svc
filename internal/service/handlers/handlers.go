@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Myrtilli/link-shortener-svc/internal/service"
+	"github.com/Myrtilli/link-shortener-svc/internal/service/dbmanagment"
 	"github.com/go-chi/chi"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
@@ -12,6 +12,12 @@ import (
 
 type URL struct {
 	URL string `json:"url"`
+}
+
+var shortenService *Shorten
+
+func InitShorten(repo *dbmanagment.Service) {
+	shortenService = NewService(repo)
 }
 
 func URLHandler(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +32,6 @@ func URLHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-
 }
 
 func handleShorten(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +48,7 @@ func handleShorten(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ShortCode, err := service.ShortenURL(input.URL)
+	ShortCode, err := shortenService.ShortenURL(input.URL)
 	if err != nil {
 		Log(r).WithError(err).Error("error: failed to shorten URL")
 		ape.RenderErr(w, problems.InternalError())
@@ -81,7 +86,7 @@ func handleOriginalURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	originalURL, err := service.ShortenURL(shortCode)
+	originalURL, err := shortenService.ResolveURL(shortCode)
 	if err != nil {
 		Log(r).WithError(err).Error("error: failed retrieve URL")
 		ape.RenderErr(w, problems.InternalError())
