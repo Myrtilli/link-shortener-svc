@@ -46,9 +46,9 @@ func Shortcode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ShortCode := shortening.EncodeBase62(insertedURL.ID)
+	shortCode := shortening.EncodeBase62(insertedURL.ID)
 
-	if err := urlRepo.UpdateShortCode(insertedURL.ID, ShortCode); err != nil {
+	if err := urlRepo.UpdateShortCode(insertedURL.ID, shortCode); err != nil {
 		logger.WithError(err).Error("failed to update short code in database")
 		ape.RenderErr(w, problems.InternalError())
 		return
@@ -61,7 +61,7 @@ func Shortcode(w http.ResponseWriter, r *http.Request) {
 
 	response := Response{
 		OriginalURL: insertedURL.LongURL,
-		ShortURL:    "http://localhost:8000/" + ShortCode,
+		ShortURL:    "http://localhost:8000/" + shortCode,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
