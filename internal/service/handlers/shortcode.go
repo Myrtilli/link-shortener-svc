@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Myrtilli/link-shortener-svc/internal/data"
-	"github.com/Myrtilli/link-shortener-svc/internal/requests"
+	"github.com/Myrtilli/link-shortener-svc/internal/service/requests"
 	"github.com/Myrtilli/link-shortener-svc/internal/shortening"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
