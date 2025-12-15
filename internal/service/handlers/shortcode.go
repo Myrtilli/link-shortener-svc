@@ -61,7 +61,7 @@ func Shortcode(w http.ResponseWriter, r *http.Request) {
 
 	response := Response{
 		OriginalURL: insertedURL.LongURL,
-		ShortURL:    "http://localhost:8000/" + shortCode,
+		ShortURL:    "http://localhost:8000/integrations/link-shortener-svc/" + shortCode,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
