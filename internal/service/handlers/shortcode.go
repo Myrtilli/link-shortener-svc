@@ -5,35 +5,32 @@ import (
 	"net/http"
 
 	"github.com/Myrtilli/link-shortener-svc/internal/data"
+	"github.com/Myrtilli/link-shortener-svc/internal/requests"
 	"github.com/Myrtilli/link-shortener-svc/internal/shortening"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 
 func Shortcode(w http.ResponseWriter, r *http.Request) {
 
-	type URL struct {
-		URL string `json:"url"`
-	}
-	var input URL
+	var request requests.CreateShortLinkRequest
 
 	logger := Log(r)
 	db := DB(r)
 
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		logger.WithError(err).Error("failed to decode request body", "error", err)
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
-	if input.URL == "" {
-		ape.RenderErr(w, problems.BadRequest(errors.New("Missing 'url' field in request body"))...)
+	if err := request.Validate(); err != nil {
+		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
 	urlToInsert := data.URL{
-		LongURL:  input.URL,
+		LongURL:  request.URL,
 		ShortURL: "",
 	}
 
