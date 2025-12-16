@@ -21,14 +21,13 @@ func OriginalURL(w http.ResponseWriter, r *http.Request) {
 	}
 
 	originalURL, err := db.URL().Get(shortCode)
-
 	if err != nil {
 		logger.WithError(err).Error("error: failed retrieve URL")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
-	if originalURL == nil || strings.TrimSpace(originalURL.LongURL) == "" {
+	if originalURL == nil {
 		logger.WithField("code", shortCode).Info("requested short code not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
