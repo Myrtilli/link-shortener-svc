@@ -2,14 +2,12 @@ package shortening
 
 import (
 	"crypto/sha256"
-	"fmt"
 	"strings"
 )
 
 const (
 	alphabet        = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	base            = uint64(len(alphabet))
-	shortKeyLength  = 8
 	hashPrefixBytes = 6
 )
 
@@ -21,26 +19,34 @@ func GenerateShortKey(url string) string {
 		id = (id << 8) | uint64(hash[i])
 	}
 
-	return EncodeBase62(id, shortKeyLength)
+	return EncodeBase62(id)
 }
 
-func EncodeBase62(id uint64, length int) string {
-	buf := make([]byte, length)
-	for i := length - 1; i >= 0; i-- {
+func EncodeBase62(id uint64) string {
+	if id == 0 {
+		return string(alphabet[0])
+	}
+
+	buf := make([]byte, 11)
+	i := len(buf)
+
+	for id > 0 {
+		i--
 		buf[i] = alphabet[id%base]
 		id /= base
 	}
-	return string(buf)
+
+	return string(buf[i:])
 }
 
-func DecodeBase62(s string) (uint64, error) {
+func DecodeBase62(s string) uint64 {
 	var id uint64
 	for i := 0; i < len(s); i++ {
 		idx := strings.IndexByte(alphabet, s[i])
 		if idx == -1 {
-			return 0, fmt.Errorf("invalid base62 character: %q", s[i])
+			return 0
 		}
 		id = id*base + uint64(idx)
 	}
-	return id, nil
+	return id
 }
