@@ -29,24 +29,16 @@ func Shortcode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	shortCode := shortening.GenerateShortKey(request.URL)
+
 	urlToInsert := data.URL{
 		LongURL:  request.URL,
-		ShortURL: "",
+		ShortURL: shortCode,
 	}
 
-	urlRepo := db.URL()
-
-	insertedURL, err := urlRepo.Insert(urlToInsert)
+	insertedURL, err := db.URL().Insert(urlToInsert)
 	if err != nil {
-		logger.WithError(err).Error("failed to insert URL into database")
-		ape.RenderErr(w, problems.InternalError())
-		return
-	}
-
-	shortCode := shortening.EncodeBase62(insertedURL.ID)
-
-	if err := urlRepo.UpdateShortCode(insertedURL.ID, shortCode); err != nil {
-		logger.WithError(err).Error("failed to update short code in database")
+		logger.WithError(err).Error("failed to insert URL")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}

@@ -1,9 +1,8 @@
 package data
 
 type URLdb interface {
-	Insert(value URL) (*URL, error)
+	Insert(URL) (*URL, error)
 	Get(shortURL string) (*URL, error)
-	UpdateShortCode(id int64, shortCode string) error
 }
 
 type URL struct {
