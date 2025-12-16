@@ -17,6 +17,7 @@ func Shortcode(w http.ResponseWriter, r *http.Request) {
 
 	logger := Log(r)
 	db := DB(r)
+	base := Base(r)
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		logger.WithError(err).Error("failed to decode request body", "error", err)
@@ -45,7 +46,7 @@ func Shortcode(w http.ResponseWriter, r *http.Request) {
 
 	response := models.ShortLinkResponse{
 		OriginalURL: insertedURL.LongURL,
-		ShortURL:    "http://localhost:8000/integrations/link-shortener-svc/" + shortCode,
+		ShortURL:    base.BaseURL() + shortCode,
 	}
 
 	ape.Render(w, response)

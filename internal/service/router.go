@@ -17,6 +17,7 @@ func (s *service) router(cfg config.Config) chi.Router {
 		ape.CtxMiddleware(
 			handlers.CtxLog(s.log),
 			handlers.CtxDB(dblogic.NewMasterQ(cfg.DB())),
+			handlers.CtxBase(cfg),
 		),
 	)
 	r.Route("/integrations/link-shortener-svc", func(r chi.Router) {
