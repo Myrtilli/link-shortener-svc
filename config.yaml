@@ -14,3 +14,7 @@ cop:
   upstream: "http://..."
   service_name: link-shortener-svc
   service_port: 80
+
+short_url:
+  base_url: "http://localhost:8000/integrations/link-shortener-svc/"
+
