@@ -1,40 +1,46 @@
 package shortening
 
-const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-const base = int64(len(alphabet))
+import (
+	"crypto/sha256"
+	"fmt"
+	"strings"
+)
 
-func EncodeBase62(id int64) string {
-	if id == 0 {
-		return string(alphabet[0])
+const (
+	alphabet        = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+	base            = uint64(len(alphabet))
+	shortKeyLength  = 8
+	hashPrefixBytes = 6
+)
+
+func GenerateShortKey(url string) string {
+	hash := sha256.Sum256([]byte(url))
+
+	var id uint64
+	for i := 0; i < hashPrefixBytes; i++ {
+		id = (id << 8) | uint64(hash[i])
 	}
 
-	var result []byte
-	for id > 0 {
-		result = append(result, alphabet[id%base])
-		id /= base
-	}
-
-	for i, j := 0, len(result)-1; i < j; i, j = i+1, j-1 {
-		result[i], result[j] = result[j], result[i]
-	}
-
-	return string(result)
+	return EncodeBase62(id, shortKeyLength)
 }
 
-func DecodeBase62(s string) int64 {
-	var id int64 = 0
-	for _, char := range s {
-		index := -1
-		for i, alphabetLetter := range alphabet {
-			if alphabetLetter == char {
-				index = i
-				break
-			}
-		}
-		if index == -1 {
-			return 0
-		}
-		id = id*base + int64(index)
+func EncodeBase62(id uint64, length int) string {
+	buf := make([]byte, length)
+	for i := length - 1; i >= 0; i-- {
+		buf[i] = alphabet[id%base]
+		id /= base
 	}
-	return id
+	return string(buf)
+}
+
+func DecodeBase62(s string) (uint64, error) {
+	var id uint64
+	for i := 0; i < len(s); i++ {
+		idx := strings.IndexByte(alphabet, s[i])
+		if idx == -1 {
+			return 0, fmt.Errorf("invalid base62 character: %q", s[i])
+		}
+		id = id*base + uint64(idx)
+	}
+	return id, nil
 }
