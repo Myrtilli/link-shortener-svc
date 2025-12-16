@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Myrtilli/link-shortener-svc/internal/data"
+	"github.com/Myrtilli/link-shortener-svc/internal/service/models"
 	"github.com/Myrtilli/link-shortener-svc/internal/service/requests"
 	"github.com/Myrtilli/link-shortener-svc/internal/shortening"
 	"gitlab.com/distributed_lab/ape"
@@ -12,7 +13,6 @@ import (
 )
 
 func Shortcode(w http.ResponseWriter, r *http.Request) {
-
 	var request requests.CreateShortLinkRequest
 
 	logger := Log(r)
@@ -51,12 +51,7 @@ func Shortcode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	type Response struct {
-		OriginalURL string `json:"original_url"`
-		ShortURL    string `json:"short_url"`
-	}
-
-	response := Response{
+	response := models.ShortLinkResponse{
 		OriginalURL: insertedURL.LongURL,
 		ShortURL:    "http://localhost:8000/integrations/link-shortener-svc/" + shortCode,
 	}
